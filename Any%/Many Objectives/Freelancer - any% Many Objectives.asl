@@ -1,5 +1,5 @@
 /**************************
-Version: 1.0
+Version: 1.1
 GitHub: https://github.com/Makeshift/Freelancer-Autosplitters
 Author: Makeshift
 ***************************/
@@ -15,6 +15,24 @@ startup {
 // run when the script first loads, add settings here
     print("Autosplitter started");
     refreshRate = 30;
+    
+    vars.onStart = (Action)( () => {
+        vars.autoSplitIndex = 0;
+        vars.gameHasStarted = false;
+        vars.timerModel = new TimerModel { CurrentState = timer };
+        vars.player_level = -1;
+        vars.prev_player_level = -1;
+        vars.next_level_skip = null;
+        vars.skip_at_level = null;
+    });
+    vars.onStart();
+    timer.OnStart += (System.EventHandler)( (s, e) => {
+        vars.onStart();
+    });
+    timer.OnReset += (LiveSplit.Model.Input.EventHandlerT<LiveSplit.Model.TimerPhase>)( (s, e) => {
+        vars.onStart();
+    });
+
     vars.autoSplits = new Tuple<string, string, string, int[], int>[]{
     // Format: Objective name in files, Mission, Objective Friendly Name, ID in files (+ list of IDs that will trigger this), enabled by default, force level skip (will skip to this split if a levelup occurs, -1 for ignored)
     // Note: 21660 is a special "no objective" objective and should be used sparingly
@@ -301,13 +319,6 @@ startup {
             settings.Add("autosplit_level_skip"+i.ToString(), true, "Skip to split '" + vars.autoSplits[i].Item2 + vars.autoSplits[i].Item3 + "' when levelling up to rank " + vars.autoSplits[i].Item5, "Force Skip On Levelup");
         }
     }
-
-    vars.autoSplitIndex = -1;
-    vars.gameHasStarted = false;
-    vars.timerModel = new TimerModel { CurrentState = timer };
-    vars.player_level = -1;
-    vars.next_level_skip = null;
-    vars.skip_at_level = null;
 }
 
 init {
@@ -347,6 +358,7 @@ update {
                 vars.skip_at_level = null;
             }
         }
+        if (timer.CurrentPhase.ToString() == "Running") print("Stopped");
     }
     //If we've levelled up, and that level is equal to the skip level, and the autosplitter is behind where it should be, set the skip up
     //Potentially do "vars.prev_player_level < vars.player_level && " here to make sure we JUST levelled up?
@@ -355,7 +367,7 @@ update {
         if (vars.next_level_skip - vars.autoSplitIndex == 1) {
             vars.timerModel.Split();
         } else {
-            // If we're going up by more than one, start skippig splits because we probably missed an autosplit and we need to catch up
+            // If we're going up by more than one, start skipping splits because we probably missed an autosplit and we need to catch up
             vars.timerModel.SkipSplit();
         }
     }
@@ -364,15 +376,12 @@ update {
 shutdown
 {
     // run when the script is stopped
-    vars.autoSplitIndex = -1;
-    vars.gameHasStarted = false;
 }
 
 
 exit
 {
     // run when the game process is lost
-
     // pause game time on crash / exit
     // timer.IsGameTimePaused = true;
 }
@@ -391,6 +400,9 @@ start
 reset
 {
     // return true when you want to reset the splits
+    //I've not figured out a nice way to work out if we're actually starting a new run or not - especially
+    //  since I often use 'New Game' to show a space scene to fix my resolution. So this has to be manual
+    //  for now.
 }
 
 split

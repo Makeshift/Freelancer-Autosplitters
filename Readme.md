@@ -5,7 +5,7 @@
 ### Any%
 
 #### Many Objectives
-This splitter contains a lot of objectives, and splits based on your current objective in-game. I attempted to include as many splits as I could so that it could be used to optimising small sections.
+This splitter contains a lot of objectives, and splits based on your current objective in-game. I attempted to include as many splits as I could so that it could be used for optimising small sections.
 
 **Features**:
 * Splits on many major (and minor) points in each mission
