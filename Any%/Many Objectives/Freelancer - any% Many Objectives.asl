@@ -308,16 +308,16 @@ startup {
         Tuple.Create("head_to_city"                                      , "Mission 13"  , "{Mission 13} Destroy City Generators" , new int[] {22235}                       , -1) ,
     };
     var addedParents = new List<string>();
-    settings.Add("Force Skip On Levelup");
+//    settings.Add("Force Skip On Levelup");
     for (int i = 0; i < vars.autoSplits.Length; i++) {
         if (!addedParents.Contains(vars.autoSplits[i].Item2)) {
             settings.Add(vars.autoSplits[i].Item2);
             addedParents.Add(vars.autoSplits[i].Item2);
         }
         settings.Add("autosplit_"+i.ToString(),true,"Split on \""+vars.autoSplits[i].Item3, vars.autoSplits[i].Item2);
-        if (vars.autoSplits[i].Item5 > 0) {
-            settings.Add("autosplit_level_skip"+i.ToString(), true, "Skip to split '" + vars.autoSplits[i].Item2 + vars.autoSplits[i].Item3 + "' when levelling up to rank " + vars.autoSplits[i].Item5, "Force Skip On Levelup");
-        }
+//        if (vars.autoSplits[i].Item5 > 0) {
+//            settings.Add("autosplit_level_skip"+i.ToString(), true, "Skip to split '" + vars.autoSplits[i].Item2 + vars.autoSplits[i].Item3 + "' when levelling up to rank " + vars.autoSplits[i].Item5, "Force Skip On Levelup");
+//        }
     }
 }
 
@@ -347,30 +347,29 @@ update {
         vars.prev_player_level = vars.player_level;
         vars.player_level = new DeepPointer("server.dll", 0xACFC0, 0x284).Deref<int>(game);
         // TODO: Clean this up
-        for (int i = vars.autoSplitIndex; i < vars.autoSplits.Length; i++) {
-            // Find the next potential levelup skip
-            if (vars.autoSplits[i].Item5 > 0 && settings["autosplit_level_skip"+i]) {
-                vars.next_level_skip = i;
-                vars.skip_at_level = vars.autoSplits[i].Item5;
-                break;
-            } else {
-                vars.next_level_skip = null;
-                vars.skip_at_level = null;
-            }
-        }
-        if (timer.CurrentPhase.ToString() == "Running") print("Stopped");
+//        for (int i = vars.autoSplitIndex; i < vars.autoSplits.Length; i++) {
+//            // Find the next potential levelup skip
+//            if (vars.autoSplits[i].Item5 > 0 && settings["autosplit_level_skip"+i]) {
+//                vars.next_level_skip = i;
+//                vars.skip_at_level = vars.autoSplits[i].Item5;
+//                break;
+//            } else {
+//                vars.next_level_skip = null;
+//                vars.skip_at_level = null;
+//            }
+//        }
     }
     //If we've levelled up, and that level is equal to the skip level, and the autosplitter is behind where it should be, set the skip up
     //Potentially do "vars.prev_player_level < vars.player_level && " here to make sure we JUST levelled up?
-    if (vars.player_level == vars.skip_at_level && vars.autoSplitIndex <= vars.next_level_skip) {
-        // If we're only going by one, just split normally because it's probably just a simple level up
-        if (vars.next_level_skip - vars.autoSplitIndex == 1) {
-            vars.timerModel.Split();
-        } else {
-            // If we're going up by more than one, start skipping splits because we probably missed an autosplit and we need to catch up
-            vars.timerModel.SkipSplit();
-        }
-    }
+//    if (vars.player_level == vars.skip_at_level && vars.autoSplitIndex <= vars.next_level_skip) {
+//        // If we're only going by one, just split normally because it's probably just a simple level up
+//        if (vars.next_level_skip - vars.autoSplitIndex == 1) {
+//            vars.timerModel.Split();
+//        } else {
+//            // If we're going up by more than one, start skipping splits because we probably missed an autosplit and we need to catch up
+//            vars.timerModel.SkipSplit();
+//        }
+//    }
 }
 
 shutdown
