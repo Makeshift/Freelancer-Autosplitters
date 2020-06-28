@@ -1,5 +1,5 @@
 /**************************
-Version: 1.1
+Version: 1.2
 GitHub: https://github.com/Makeshift/Freelancer-Autosplitters
 Author: Makeshift
 ***************************/
